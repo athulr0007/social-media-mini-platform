@@ -22,16 +22,21 @@ import adminRoutes from "./routes/adminRoutes.js";
 import Message from "./models/Message.js";
 import { setIO } from "./utils/createActivity.js";
 
-
 import mongoose from "mongoose";
 import User from "./models/User.js";
 import oauthRoutes from "./routes/oauthRoutes.js";
 
-
 dotenv.config();
 connectDB();
 
-// Configure Passport Google Strategy
+/* ---------------- CORS ORIGINS ---------------- */
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+/* ---------------- PASSPORT GOOGLE ---------------- */
 passport.use(
   new GoogleStrategy(
     {
@@ -42,13 +47,19 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const email = profile.emails && profile.emails[0] && profile.emails[0].value && profile.emails[0].value.toLowerCase();
+        const email =
+          profile.emails &&
+          profile.emails[0] &&
+          profile.emails[0].value &&
+          profile.emails[0].value.toLowerCase();
         if (!email) return done(new Error("No email in Google profile"));
 
         let user = await User.findOne({ email });
         if (!user) {
-          // create unique username based on email local part
-          const base = email.split("@")[0].replace(/[^a-z0-9_.]/gi, "").toLowerCase();
+          const base = email
+            .split("@")[0]
+            .replace(/[^a-z0-9_.]/gi, "")
+            .toLowerCase();
           let username = base;
           let i = 0;
           while (await User.findOne({ username })) {
@@ -61,7 +72,10 @@ passport.use(
             email,
             password: "",
             isVerified: true,
-            avatar: profile.photos && profile.photos[0] && profile.photos[0].value ? profile.photos[0].value : null,
+            avatar:
+              profile.photos && profile.photos[0] && profile.photos[0].value
+                ? profile.photos[0].value
+                : null,
           });
         }
         return done(null, user);
@@ -72,7 +86,6 @@ passport.use(
   )
 );
 
-
 /* ---------------- APP & SERVER ---------------- */
 const app = express();
 const server = http.createServer(app);
@@ -80,24 +93,24 @@ const server = http.createServer(app);
 /* ---------------- SOCKET.IO ---------------- */
 const io = new Server(server, {
   cors: {
-    origin: /^http:\/\/localhost:\d+$/,
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
 /* ---------------- SOCKET STATE ---------------- */
 const onlineUsers = new Map(); // userId -> socketId
 
-// Set IO instance for activity emissions
 setIO(io);
 
 io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
 
-  /* USER ONLINE - also join personal room */
+  /* USER ONLINE */
   socket.on("user:online", (userId) => {
     onlineUsers.set(userId, socket.id);
-    socket.join(userId); // Join room with userId to receive personal notifications
+    socket.join(userId);
     io.emit("users:online", Array.from(onlineUsers.keys()));
   });
 
@@ -142,13 +155,12 @@ io.on("connection", (socket) => {
 
 /* ---------------- EXPRESS MIDDLEWARE ---------------- */
 app.use(cors({
-  origin: /^http:\/\/localhost:\d+$/,
+  origin: allowedOrigins,
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
 
-// Initialize passport
 app.use(passport.initialize());
 
 const __filename = fileURLToPath(import.meta.url);
