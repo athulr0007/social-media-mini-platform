@@ -20,6 +20,7 @@ const createBot = async () => {
       email: "bot@spark.ai",
       password: "no-password-needed",
       isVerified: true,
+      isBot: true, 
       bio: "I'm Spark AI, your friendly assistant. Ask me anything!"
     });
     console.log("Bot created!");

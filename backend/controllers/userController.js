@@ -147,7 +147,7 @@ export const getUserById = async (req, res) => {
   const user = await User.findById(req.params.id)
     .select("-password");
 
-  if (!user) {
+  if (!user || user.isBot) {
     return res.status(404).json({ message: "User not found" });
   }
 
@@ -169,7 +169,8 @@ export const searchUsers = async (req, res) => {
         { username: { $regex: q, $options: "i" } },
         { email: { $regex: q, $options: "i" } }
       ],
-      _id: { $ne: req.user._id }
+      _id: { $ne: req.user._id },
+      isBot: false
     })
       .select("name username email avatar bio followers following")
       .limit(20);
@@ -189,7 +190,8 @@ export const getSuggestedUsers = async (req, res) => {
       _id: { 
         $ne: req.user._id,
         $nin: currentUser.following
-      }
+      },
+      isBot: false
     })
       .select("name username email avatar bio followers following")
       .limit(10)

@@ -12,10 +12,13 @@ import {
   Stack,
   Paper,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Chip
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SmartToyIcon from "@mui/icons-material/SmartToy";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 const socket = io("http://localhost:5000");
 
@@ -30,6 +33,8 @@ export default function Messages() {
   const [text, setText] = useState("");
   const [otherUser, setOtherUser] = useState(null);
   const messagesEndRef = useRef(null);
+
+  const isAIChat = otherUser?.name === "Spark AI";
 
   useEffect(() => {
     loadConversation();
@@ -97,7 +102,7 @@ export default function Messages() {
         height: isMobile ? "calc(100vh - 70px)" : "100vh",
         display: "flex", 
         flexDirection: "column",
-bgcolor: "background.default"
+        bgcolor: "background.default"
       }}
     >
       {/* HEADER */}
@@ -108,11 +113,16 @@ bgcolor: "background.default"
           display: "flex", 
           alignItems: "center", 
           gap: 2,
-bgcolor: "background.paper",
+          bgcolor: isAIChat 
+            ? "linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)"
+            : "background.paper",
+          background: isAIChat
+            ? "linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)"
+            : undefined,
           backdropFilter: "blur(20px) saturate(180%)",
           WebkitBackdropFilter: "blur(20px) saturate(180%)",
-borderBottom: "1px solid",
-borderColor: "divider",
+          borderBottom: "1px solid",
+          borderColor: isAIChat ? "rgba(102, 126, 234, 0.3)" : "divider",
           position: "sticky",
           top: 0,
           zIndex: 10
@@ -131,25 +141,77 @@ borderColor: "divider",
           <ArrowBackIcon />
         </IconButton>
         
-        <Avatar
-          src={otherUser?.avatar ? `http://localhost:5000${otherUser.avatar}` : undefined}
-          sx={{ 
-            width: 44, 
-            height: 44,
-            border: "2px solid rgba(102, 126, 234, 0.2)",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)"
-          }}
-        >
-          {!otherUser?.avatar && (otherUser?.name?.[0] || "?")}
-        </Avatar>
+        {isAIChat ? (
+          <Box sx={{ position: "relative" }}>
+            <Avatar
+              sx={{ 
+                width: 44, 
+                height: 44,
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                border: "2px solid rgba(102, 126, 234, 0.3)",
+                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)"
+              }}
+            >
+              <SmartToyIcon sx={{ color: "#fff" }} />
+            </Avatar>
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 60,
+                height: 60,
+                borderRadius: "50%",
+                background: "rgba(102, 126, 234, 0.3)",
+                filter: "blur(15px)",
+                animation: "pulse 2s ease-in-out infinite",
+                zIndex: -1
+              }}
+            />
+          </Box>
+        ) : (
+          <Avatar
+            src={otherUser?.avatar ? `http://localhost:5000${otherUser.avatar}` : undefined}
+            sx={{ 
+              width: 44, 
+              height: 44,
+              border: "2px solid rgba(102, 126, 234, 0.2)",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)"
+            }}
+          >
+            {!otherUser?.avatar && (otherUser?.name?.[0] || "?")}
+          </Avatar>
+        )}
         
         <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="h6" fontWeight={600}>
-            {otherUser?.name || "Loading..."}
-          </Typography>
-          {otherUser?.username && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography variant="h6" fontWeight={600}>
+              {otherUser?.name || "Loading..."}
+            </Typography>
+            {isAIChat && (
+              <Chip
+                icon={<AutoAwesomeIcon sx={{ fontSize: 12, color: "#667eea !important" }} />}
+                label="AI"
+                size="small"
+                sx={{
+                  bgcolor: "rgba(102, 126, 234, 0.15)",
+                  color: "#667eea",
+                  fontWeight: 600,
+                  fontSize: "0.65rem",
+                  height: 20
+                }}
+              />
+            )}
+          </Box>
+          {otherUser?.username && !isAIChat && (
             <Typography variant="caption" color="text.secondary">
               @{otherUser.username}
+            </Typography>
+          )}
+          {isAIChat && (
+            <Typography variant="caption" sx={{ color: "#667eea" }}>
+              AI Assistant • Always here to help
             </Typography>
           )}
         </Box>
@@ -161,7 +223,7 @@ borderColor: "divider",
           flexGrow: 1, 
           overflow: "auto", 
           p: 3,
-bgcolor: "background.default"
+          bgcolor: "background.default"
         }}
       >
         {messages.length === 0 ? (
@@ -170,16 +232,35 @@ bgcolor: "background.default"
               display: "flex", 
               alignItems: "center", 
               justifyContent: "center",
-              height: "100%"
+              flexDirection: "column",
+              height: "100%",
+              gap: 2
             }}
           >
+            {isAIChat && (
+              <Avatar
+                sx={{
+                  width: 80,
+                  height: 80,
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  mb: 2,
+                  boxShadow: "0 8px 32px rgba(102, 126, 234, 0.4)"
+                }}
+              >
+                <SmartToyIcon sx={{ fontSize: 40, color: "#fff" }} />
+              </Avatar>
+            )}
             <Typography color="text.secondary" textAlign="center">
-              No messages yet. Start the conversation!
+              {isAIChat 
+                ? "Hi! I'm Spark AI. Ask me anything and I'll help you out! 🤖"
+                : "No messages yet. Start the conversation!"
+              }
             </Typography>
           </Box>
         ) : (
           messages.map((msg, i) => {
             const isMe = msg.sender === user._id || msg.sender._id === user._id;
+            const isBotMessage = !isMe && isAIChat;
 
             return (
               <Box
@@ -192,17 +273,46 @@ bgcolor: "background.default"
                 }}
               >
                 {!isMe && (
-                  <Avatar
-                    src={otherUser?.avatar ? `http://localhost:5000${otherUser.avatar}` : undefined}
-                    sx={{ 
-                      width: 32, 
-                      height: 32, 
-                      mr: 1,
-                      mt: "auto"
-                    }}
-                  >
-                    {!otherUser?.avatar && (otherUser?.name?.[0] || "?")}
-                  </Avatar>
+                  <Box sx={{ position: "relative" }}>
+                    <Avatar
+                      src={!isAIChat && otherUser?.avatar ? `http://localhost:5000${otherUser.avatar}` : undefined}
+                      sx={{ 
+                        width: 32, 
+                        height: 32, 
+                        mr: 1,
+                        mt: "auto",
+                        background: isBotMessage 
+                          ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                          : undefined,
+                        boxShadow: isBotMessage
+                          ? "0 4px 12px rgba(102, 126, 234, 0.3)"
+                          : undefined
+                      }}
+                    >
+                      {isBotMessage ? (
+                        <SmartToyIcon sx={{ fontSize: 18, color: "#fff" }} />
+                      ) : (
+                        !otherUser?.avatar && (otherUser?.name?.[0] || "?")
+                      )}
+                    </Avatar>
+                    {isBotMessage && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          width: 45,
+                          height: 45,
+                          borderRadius: "50%",
+                          background: "rgba(102, 126, 234, 0.2)",
+                          filter: "blur(12px)",
+                          animation: "pulse 2s ease-in-out infinite",
+                          zIndex: -1
+                        }}
+                      />
+                    )}
+                  </Box>
                 )}
                 
                 <Paper
@@ -210,29 +320,32 @@ bgcolor: "background.default"
                     p: 1.5,
                     px: 2,
                     maxWidth: "70%",
-                   background: isMe
-  ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-  : theme.palette.mode === "dark"
-    ? "rgba(255,255,255,0.06)"
-    : theme.palette.background.paper,
-
+                    background: isMe
+                      ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                      : isBotMessage
+                        ? "linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)"
+                        : theme.palette.mode === "dark"
+                          ? "rgba(255,255,255,0.06)"
+                          : theme.palette.background.paper,
                     backdropFilter: "blur(10px)",
-color: isMe ? "#fff" : theme.palette.text.primary,
+                    color: isMe ? "#fff" : theme.palette.text.primary,
                     borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
                     boxShadow: isMe
                       ? "0 4px 12px rgba(102, 126, 234, 0.3)"
-                      : "0 2px 8px rgba(0, 0, 0, 0.08)",
+                      : isBotMessage
+                        ? "0 4px 12px rgba(102, 126, 234, 0.15)"
+                        : "0 2px 8px rgba(0, 0, 0, 0.08)",
                     wordBreak: "break-word",
                     position: "relative",
-border: isMe ? "none" : "1px solid",
-borderColor: isMe ? "transparent" : "divider"
+                    border: isMe ? "none" : isBotMessage ? "1px solid rgba(102, 126, 234, 0.2)" : "1px solid",
+                    borderColor: isMe ? "transparent" : isBotMessage ? "rgba(102, 126, 234, 0.2)" : "divider"
                   }}
                 >
                   <Typography 
                     sx={{ 
                       fontSize: "0.95rem",
                       lineHeight: 1.5,
-                      color: isMe ? "#fff" : "text.primary"
+                      color: isMe ? "#fff" : isBotMessage ? "#667eea" : "text.primary"
                     }}
                   >
                     {msg.text}
@@ -264,51 +377,50 @@ borderColor: isMe ? "transparent" : "divider"
         elevation={0}
         sx={{ 
           p: 2,
-bgcolor: "background.paper",
+          bgcolor: "background.paper",
           backdropFilter: "blur(20px) saturate(180%)",
           WebkitBackdropFilter: "blur(20px) saturate(180%)",
-borderTop: "1px solid",
-borderColor: "divider",
+          borderTop: "1px solid",
+          borderColor: isAIChat ? "rgba(102, 126, 234, 0.3)" : "divider",
           boxShadow: "0 -2px 12px rgba(0, 0, 0, 0.04)"
         }}
       >
         <Stack direction="row" spacing={1} alignItems="flex-end">
           <TextField
             fullWidth
-            placeholder="Type a message..."
+            placeholder={isAIChat ? "Ask Spark AI anything..." : "Type a message..."}
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyPress={handleKeyPress}
             multiline
             maxRows={4}
             sx={{
-  "& .MuiOutlinedInput-root": {
-    bgcolor: "background.default",
-    borderRadius: 3,
-    transition: "all 0.3s ease",
-    color: "text.primary",
-    "& fieldset": {
-      borderColor: "divider"
-    },
-    "&:hover fieldset": {
-      borderColor: "primary.main"
-    },
-    "&.Mui-focused": {
-      bgcolor: "background.paper",
-      "& fieldset": {
-        borderColor: "primary.main"
-      }
-    }
-  },
-  "& .MuiInputBase-input": {
-    color: "text.primary"
-  },
-  "& .MuiInputBase-input::placeholder": {
-    color: "text.secondary",
-    opacity: 1
-  }
-}}
-
+              "& .MuiOutlinedInput-root": {
+                bgcolor: "background.default",
+                borderRadius: 3,
+                transition: "all 0.3s ease",
+                color: "text.primary",
+                "& fieldset": {
+                  borderColor: isAIChat ? "rgba(102, 126, 234, 0.3)" : "divider"
+                },
+                "&:hover fieldset": {
+                  borderColor: "primary.main"
+                },
+                "&.Mui-focused": {
+                  bgcolor: "background.paper",
+                  "& fieldset": {
+                    borderColor: "primary.main"
+                  }
+                }
+              },
+              "& .MuiInputBase-input": {
+                color: "text.primary"
+              },
+              "& .MuiInputBase-input::placeholder": {
+                color: "text.secondary",
+                opacity: 1
+              }
+            }}
           />
           <IconButton
             onClick={sendMessage}
@@ -349,6 +461,17 @@ borderColor: "divider",
             to {
               opacity: 1;
               transform: translateY(0);
+            }
+          }
+          
+          @keyframes pulse {
+            0%, 100% {
+              opacity: 0.4;
+              transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+              opacity: 0.6;
+              transform: translate(-50%, -50%) scale(1.1);
             }
           }
         `}
