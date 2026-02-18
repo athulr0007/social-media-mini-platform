@@ -20,6 +20,22 @@ router.post("/:id", protect, async (req, res) => {
   const me = await User.findById(req.user._id);
   const target = await User.findById(targetId);
 
+  // Allow Spark AI without mutual follow requirement
+if (target && target.username === "sparkbot") {
+  let convo = await Conversation.findOne({
+    participants: { $all: [req.user._id, targetId] }
+  });
+
+  if (!convo) {
+    convo = await Conversation.create({
+      participants: [req.user._id, targetId]
+    });
+  }
+
+  return res.json(convo);
+}
+
+
   if (
     !me.following.includes(targetId) ||
     !target.following.includes(req.user._id)

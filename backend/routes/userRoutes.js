@@ -11,6 +11,7 @@ import {
   searchUsers,
   getSuggestedUsers
 } from "../controllers/userController.js";
+import User from "../models/User.js";
 
 const router = express.Router();
 
@@ -28,6 +29,13 @@ router.put("/:id/follow", protect, toggleFollow);
 
 /* MUTUAL FOLLOW CHECK */
 router.get("/:id/mutual", protect, checkMutualFollow);
+
+
+router.get("/bot", protect, async (req, res) => {
+  const bot = await User.findOne({ username: "sparkbot" })
+  .select("_id name username");
+  res.json(bot);
+});
 
 /* OTHER USER PROFILE */
 router.get("/:id", protect, getUserById);

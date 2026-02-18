@@ -1,7 +1,7 @@
 import express from "express";
 import http from "http";
 import cors from "cors";
-import dotenv from "dotenv";
+import "dotenv/config";
 import path from "path";
 import { fileURLToPath } from "url";
 import { Server } from "socket.io";
@@ -26,8 +26,10 @@ import mongoose from "mongoose";
 import User from "./models/User.js";
 import oauthRoutes from "./routes/oauthRoutes.js";
 
-dotenv.config();
+import Conversation from "./models/Conversation.js";
+
 connectDB();
+import { generateResponse } from "./services/geminiService.js";
 
 /* ---------------- CORS ORIGINS ---------------- */
 const allowedOrigins = [
@@ -120,16 +122,44 @@ io.on("connection", (socket) => {
   });
 
   /* SEND MESSAGE */
-  socket.on("message:send", async (data) => {
-    const message = await Message.create({
+socket.on("message:send", async (data) => {
+  const message = await Message.create({
+    conversation: data.conversationId,
+    sender: data.senderId,
+    text: data.text,
+    status: "sent"
+  });
+
+  io.to(data.conversationId).emit("message:new", message);
+
+  // --- BOT LOGIC ---
+  const conversation = await Conversation.findById(data.conversationId);
+  const bot = await User.findOne({ username: "sparkbot" });
+
+  if (
+    bot &&
+    conversation.participants.some(
+      id => id.toString() === bot._id.toString()
+    )
+  ) {
+    if (data.senderId === bot._id.toString()) return;
+
+const user = await User.findById(data.senderId);
+const reply = await generateResponse(data.text, user.name);
+
+    const botMessage = await Message.create({
       conversation: data.conversationId,
-      sender: data.senderId,
-      text: data.text,
+      sender: bot._id,
+      text: reply,
       status: "sent"
     });
 
-    io.to(data.conversationId).emit("message:new", message);
-  });
+    setTimeout(() => {
+      io.to(data.conversationId).emit("message:new", botMessage);
+    }, 1000);
+  }
+});
+
 
   /* MESSAGE SEEN */
   socket.on("message:seen", async ({ conversationId, messageIds }) => {

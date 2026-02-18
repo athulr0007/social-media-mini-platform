@@ -2,6 +2,10 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+
+import SmartToyIcon from "@mui/icons-material/SmartToy";
+import { Button } from "@mui/material";
+
 import {
   Box,
   Typography,
@@ -35,6 +39,20 @@ export default function Inbox() {
     }
   };
 
+const startBotChat = async () => {
+  try {
+    const bot = await API.get("/users/bot");
+
+    const res = await API.post(`/conversations/${bot.data._id}`);
+
+    navigate(`/messages/${res.data._id}`);
+  } catch (err) {
+    console.error("Failed to start bot chat:", err);
+  }
+};
+
+
+
   if (loading) {
     return (
       <Box sx={{ maxWidth: 720, mx: "auto", py: 3 }}>
@@ -52,6 +70,15 @@ export default function Inbox() {
       <Typography variant="h5" mb={3}>
         Messages
       </Typography>
+      <Button
+  variant="contained"
+  startIcon={<SmartToyIcon />}
+  onClick={startBotChat}
+  sx={{ mb: 2 }}
+>
+  Chat with Spark AI
+</Button>
+
 
       {convos.length === 0 ? (
         <Typography color="text.secondary">
