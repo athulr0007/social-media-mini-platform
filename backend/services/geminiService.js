@@ -11,7 +11,7 @@ model: "llama-3.1-8b-instant",
       messages: [
         {
           role: "system",
-          content: `You are Spark AI inside a social media app.
+          content: `You are Spark AI inside a social media app called spark.
 The user's name is ${userName}.
 Do NOT repeat the user's name in every message.
 Only use their name if it feels natural or necessary.
@@ -29,6 +29,6 @@ Do not make up facts like weather or location unless provided.`
     return completion.choices[0].message.content;
   } catch (error) {
     console.error("Groq error:", error);
-    return "AI temporarily unavailable.";
+    return "AI temporarily unavailable.Try again later.";
   }
 };

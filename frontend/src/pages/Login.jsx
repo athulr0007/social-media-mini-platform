@@ -13,7 +13,6 @@ import {
   InputAdornment,
   Fade,
   Slide,
-  alpha,
   Divider
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -41,7 +40,7 @@ export default function Login() {
     setError("");
     setOtp("");
     try {
-      const res = await API.post("/auth/login", { email, password });
+      await API.post("/auth/login", { email, password });
       setShowOtpForm(true);
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
@@ -56,8 +55,6 @@ export default function Login() {
     setError("");
     try {
       const res = await API.post("/auth/verify-login-otp", { email, otp });
-      console.log("Login response:", res.data);  // ADD THIS
-console.log("Avatar in login:", res.data.avatar);  // ADD THIS
       login(res.data);
       navigate("/");
     } catch (err) {
@@ -86,6 +83,57 @@ console.log("Avatar in login:", res.data.avatar);  // ADD THIS
     }
   };
 
+  // Shared TextField sx — defined once to avoid repetition
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      bgcolor: "rgba(255, 255, 255, 0.05)",
+      backdropFilter: "blur(10px)",
+      borderRadius: 2,
+      transition: "all 0.3s ease",
+      "& fieldset": { borderColor: "rgba(255, 255, 255, 0.2)", borderWidth: "1px" },
+      "&:hover fieldset": { borderColor: "rgba(102, 126, 234, 0.5)" },
+      "&.Mui-focused fieldset": { borderColor: "#667eea", borderWidth: "2px" },
+      "& input": { color: "#fff" },
+    },
+    "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.6)" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#667eea" },
+  };
+
+  const submitBtnSx = {
+    py: { xs: 1.4, sm: 1.8 },
+    borderRadius: 2.5,
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    fontSize: { xs: "0.9rem", sm: "1rem" },
+    fontWeight: 600,
+    textTransform: "none",
+    boxShadow: "0 8px 24px rgba(102, 126, 234, 0.4)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    transition: "all 0.3s ease",
+    position: "relative",
+    overflow: "hidden",
+    "&::before": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      left: "-100%",
+      width: "100%",
+      height: "100%",
+      background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
+      transition: "left 0.5s ease",
+    },
+    "&:hover": {
+      background: "linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)",
+      boxShadow: "0 12px 32px rgba(102, 126, 234, 0.6)",
+      transform: "translateY(-2px)",
+      "&::before": { left: "100%" },
+    },
+    "&:active": { transform: "translateY(0px)" },
+    "&.Mui-disabled": {
+      background: "rgba(255, 255, 255, 0.1)",
+      color: "rgba(255, 255, 255, 0.3)",
+    },
+  };
+
   return (
     <Box
       sx={{
@@ -93,215 +141,112 @@ console.log("Avatar in login:", res.data.avatar);  // ADD THIS
         display: "flex",
         background: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
       }}
     >
-      {/* ANIMATED BACKGROUND ELEMENTS */}
-      <Box
-        sx={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          overflow: "hidden",
-          opacity: 0.4
-        }}
-      >
-        <Box
-          sx={{
+      {/* ANIMATED BACKGROUND */}
+      <Box sx={{ position: "absolute", width: "100%", height: "100%", overflow: "hidden", opacity: 0.4 }}>
+        {[
+          { w: 500, h: 500, color: "rgba(138,43,226,0.3)", top: "-10%", left: "-5%", dur: "25s" },
+          { w: 400, h: 400, color: "rgba(0,191,255,0.3)", bottom: "-10%", right: "-5%", dur: "20s", rev: true },
+          { w: 350, h: 350, color: "rgba(255,0,255,0.2)", top: "40%", right: "10%", dur: "30s" },
+        ].map((b, i) => (
+          <Box key={i} sx={{
             position: "absolute",
-            width: 500,
-            height: 500,
+            width: b.w, height: b.h,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(138,43,226,0.3) 0%, transparent 70%)",
-            top: "-10%",
-            left: "-5%",
-            animation: "float 25s ease-in-out infinite",
-            filter: "blur(60px)"
-          }}
-        />
-        <Box
-          sx={{
-            position: "absolute",
-            width: 400,
-            height: 400,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(0,191,255,0.3) 0%, transparent 70%)",
-            bottom: "-10%",
-            right: "-5%",
-            animation: "float 20s ease-in-out infinite reverse",
-            filter: "blur(60px)"
-          }}
-        />
-        <Box
-          sx={{
-            position: "absolute",
-            width: 350,
-            height: 350,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,0,255,0.2) 0%, transparent 70%)",
-            top: "40%",
-            right: "10%",
-            animation: "float 30s ease-in-out infinite",
-            filter: "blur(70px)"
-          }}
-        />
+            background: `radial-gradient(circle, ${b.color} 0%, transparent 70%)`,
+            top: b.top, left: b.left, bottom: b.bottom, right: b.right,
+            animation: `float ${b.dur} ease-in-out infinite${b.rev ? " reverse" : ""}`,
+            filter: "blur(60px)",
+          }} />
+        ))}
       </Box>
 
-      <style>
-        {`
-          @keyframes float {
-            0%, 100% { 
-              transform: translate(0, 0) scale(1); 
-            }
-            33% { 
-              transform: translate(30px, -30px) scale(1.1); 
-            }
-            66% { 
-              transform: translate(-20px, 20px) scale(0.9); 
-            }
-          }
-          
-          @keyframes sparkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-          }
-        `}
-      </style>
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -30px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        @keyframes sparkle {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+      `}</style>
 
       {/* MAIN CONTAINER */}
-      <Box
-        sx={{
-          display: "flex",
-          width: "100%",
-          maxWidth: 1400,
-          mx: "auto",
-          alignItems: "center",
-          px: 4,
-          position: "relative",
-          zIndex: 1
-        }}
-      >
-        {/* LEFT SIDE - BRANDING */}
+      <Box sx={{
+        display: "flex",
+        width: "100%",
+        maxWidth: 1400,
+        mx: "auto",
+        alignItems: "center",
+        px: { xs: 2, sm: 3, md: 4 },   // ← tighter on mobile
+        position: "relative",
+        zIndex: 1,
+      }}>
+        {/* LEFT BRANDING — desktop only */}
         <Slide direction="right" in timeout={800}>
-          <Box
-            sx={{
-              flex: 1,
-              pr: 8,
-              display: { xs: "none", md: "block" }
-            }}
-          >
+          <Box sx={{ flex: 1, pr: 8, display: { xs: "none", md: "block" } }}>
             <Fade in timeout={1200}>
               <Box>
-                {/* LOGO */}
                 <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
-                  <Box
-                    sx={{
-                      width: 70,
-                      height: 70,
-                      borderRadius: "20px",
-                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mr: 2,
-                      boxShadow: "0 10px 30px rgba(102,126,234,0.4)",
-                      position: "relative",
-                      overflow: "hidden"
-                    }}
-                  >
+                  <Box sx={{
+                    width: 70, height: 70, borderRadius: "20px",
+                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    mr: 2, boxShadow: "0 10px 30px rgba(102,126,234,0.4)",
+                    position: "relative", overflow: "hidden",
+                  }}>
                     <FlashOnIcon sx={{ fontSize: 40, color: "#fff", zIndex: 2 }} />
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        width: "100%",
-                        height: "100%",
-                        background: "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)",
-                        animation: "sparkle 3s ease-in-out infinite"
-                      }}
-                    />
+                    <Box sx={{
+                      position: "absolute", width: "100%", height: "100%",
+                      background: "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)",
+                      animation: "sparkle 3s ease-in-out infinite",
+                    }} />
                   </Box>
-                  <Typography
-                    variant="h3"
-                    sx={{
-                      color: "#fff",
-                      fontWeight: 800,
-                      letterSpacing: "0.5px"
-                    }}
-                  >
+                  <Typography variant="h3" sx={{ color: "#fff", fontWeight: 800, letterSpacing: "0.5px" }}>
                     SPARK
                   </Typography>
                 </Box>
 
-                <Typography
-                  variant="h2"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    mb: 3,
-                    fontSize: { md: "2.8rem", lg: "3.5rem" },
-                    lineHeight: 1.2
-                  }}
-                >
-                  Welcome back to
-                  <br />
-                  <Box
-                    component="span"
-                    sx={{
-                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      fontWeight: 900
-                    }}
-                  >
+                <Typography variant="h2" sx={{
+                  color: "#fff", fontWeight: 700, mb: 3,
+                  fontSize: { md: "2.8rem", lg: "3.5rem" }, lineHeight: 1.2,
+                }}>
+                  Welcome back to<br />
+                  <Box component="span" sx={{
+                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontWeight: 900,
+                  }}>
                     your community
                   </Box>
                 </Typography>
 
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: "rgba(255,255,255,0.85)",
-                    mb: 5,
-                    fontWeight: 400,
-                    lineHeight: 1.7,
-                    maxWidth: 500
-                  }}
-                >
+                <Typography variant="h6" sx={{
+                  color: "rgba(255,255,255,0.85)", mb: 5, fontWeight: 400, lineHeight: 1.7, maxWidth: 500,
+                }}>
                   Connect with friends, share your moments, and discover what's happening around the world.
                 </Typography>
 
-                {/* FEATURE ICONS */}
                 <Stack spacing={3}>
                   {[
                     { icon: <PhotoCameraIcon />, text: "Share photos and stories" },
                     { icon: <PeopleIcon />, text: "Connect with friends globally" },
-                    { icon: <ChatBubbleIcon />, text: "Real-time messaging" }
+                    { icon: <ChatBubbleIcon />, text: "Real-time messaging" },
                   ].map((feature, i) => (
                     <Fade key={i} in timeout={1500 + i * 200}>
                       <Stack direction="row" spacing={2.5} alignItems="center">
-                        <Box
-                          sx={{
-                            width: 45,
-                            height: 45,
-                            borderRadius: "12px",
-                            background: "rgba(255,255,255,0.1)",
-                            backdropFilter: "blur(10px)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            border: "1px solid rgba(255,255,255,0.2)",
-                            color: "#fff"
-                          }}
-                        >
+                        <Box sx={{
+                          width: 45, height: 45, borderRadius: "12px",
+                          background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          border: "1px solid rgba(255,255,255,0.2)", color: "#fff",
+                        }}>
                           {feature.icon}
                         </Box>
-                        <Typography 
-                          sx={{ 
-                            color: "rgba(255,255,255,0.9)",
-                            fontSize: "1.05rem",
-                            fontWeight: 500
-                          }}
-                        >
+                        <Typography sx={{ color: "rgba(255,255,255,0.9)", fontSize: "1.05rem", fontWeight: 500 }}>
                           {feature.text}
                         </Typography>
                       </Stack>
@@ -313,277 +258,134 @@ console.log("Avatar in login:", res.data.avatar);  // ADD THIS
           </Box>
         </Slide>
 
-        {/* RIGHT SIDE - FORM */}
+        {/* FORM CARD */}
         <Slide direction="left" in timeout={800}>
-          <Box sx={{ flex: { xs: 1, md: 0.8 }, maxWidth: 500 }}>
-            <Card
-              sx={{
-                p: 5,
-                borderRadius: 5,
-                position: "relative",
-                overflow: "visible",
-                background: "rgba(255, 255, 255, 0.08)",
-                backdropFilter: "blur(20px) saturate(180%)",
-                WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                border: "2px solid rgba(255, 255, 255, 0.18)",
-                boxShadow: `
-                  0 8px 32px 0 rgba(31, 38, 135, 0.37),
-                  0 30px 60px rgba(0, 0, 0, 0.3),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                  inset 0 -1px 0 rgba(255, 255, 255, 0.1)
-                `,
-                "&::before": {
-                  content: '""',
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: "1px",
-                  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)"
-                }
-              }}
-            >
-              {/* LOGO FOR MOBILE */}
-              <Box 
-                sx={{ 
-                  display: { xs: "flex", md: "none" }, 
-                  alignItems: "center", 
-                  justifyContent: "center",
-                  mb: 3 
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: "16px",
-                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 8px 24px rgba(102,126,234,0.4)"
-                  }}
-                >
-                  <FlashOnIcon sx={{ fontSize: 35, color: "#fff" }} />
+          <Box sx={{
+            flex: { xs: 1, md: 0.8 },
+            maxWidth: { xs: "100%", sm: 440, md: 500 },
+            width: "100%",
+            mx: { xs: 0, md: "auto" },
+            py: { xs: 2, sm: 4 },   // breathing room top/bottom on mobile
+          }}>
+            <Card sx={{
+              p: { xs: 3, sm: 4, md: 5 },   // ← key fix: smaller padding on mobile
+              borderRadius: { xs: 4, sm: 5 },
+              position: "relative",
+              overflow: "visible",
+              background: "rgba(255, 255, 255, 0.08)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              border: "2px solid rgba(255, 255, 255, 0.18)",
+              boxShadow: `
+                0 8px 32px 0 rgba(31, 38, 135, 0.37),
+                0 30px 60px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1)
+              `,
+              "&::before": {
+                content: '""', position: "absolute", top: 0, left: 0, right: 0, height: "1px",
+                background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)",
+              },
+            }}>
+              {/* MOBILE LOGO */}
+              <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center", justifyContent: "center", mb: 2.5 }}>
+                <Box sx={{
+                  width: 48, height: 48,   // ← smaller logo on mobile
+                  borderRadius: "14px",
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: "0 8px 24px rgba(102,126,234,0.4)",
+                }}>
+                  <FlashOnIcon sx={{ fontSize: 28, color: "#fff" }} />
                 </Box>
               </Box>
 
-              <Typography
-                variant="h4"
-                fontWeight={700}
-                mb={1}
+              <Typography variant="h4" fontWeight={700}
                 sx={{
                   background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  textAlign: { xs: "center", md: "left" }
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  textAlign: { xs: "center", md: "left" },
+                  fontSize: { xs: "1.5rem", sm: "2rem" },   // ← scaled down on mobile
+                  mb: 0.5,
                 }}
               >
                 {showOtpForm ? "Verify OTP" : "Sign in"}
               </Typography>
 
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: "rgba(255,255,255,0.7)", 
-                  mb: 4,
-                  textAlign: { xs: "center", md: "left" }
-                }}
-              >
+              <Typography variant="body2" sx={{
+                color: "rgba(255,255,255,0.7)",
+                mb: { xs: 2.5, sm: 4 },   // ← tighter gap on mobile
+                textAlign: { xs: "center", md: "left" },
+                fontSize: { xs: "0.8rem", sm: "0.875rem" },
+              }}>
                 {showOtpForm ? "Enter the OTP sent to your email" : "Enter your credentials to continue"}
               </Typography>
 
               {!showOtpForm ? (
-                // LOGIN FORM
                 <>
-<form onSubmit={handleLogin} autoComplete="off">
-                    <Stack spacing={3}>
-                      <TextField
-                        fullWidth
-                        label="Email address"
-                        type="email"
-                        autoComplete="new-email"
-                        value={email}
+                  <form onSubmit={handleLogin} autoComplete="off">
+                    <Stack spacing={{ xs: 2, sm: 3 }}>   {/* ← tighter field gaps on mobile */}
+                      <TextField fullWidth label="Email address" type="email"
+                        autoComplete="new-email" value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        required
-                        disabled={loading}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            bgcolor: "rgba(255, 255, 255, 0.05)",
-                            backdropFilter: "blur(10px)",
-                            borderRadius: 2,
-                            transition: "all 0.3s ease",
-                            "& fieldset": {
-                              borderColor: "rgba(255, 255, 255, 0.2)",
-                              borderWidth: "1px"
-                            },
-                            "&:hover fieldset": {
-                              borderColor: "rgba(102, 126, 234, 0.5)"
-                            },
-                            "&.Mui-focused fieldset": {
-                              borderColor: "#667eea",
-                              borderWidth: "2px"
-                            },
-                            "& input": {
-                              color: "#fff"
-                            }
-                          },
-                          "& .MuiInputLabel-root": {
-                            color: "rgba(255, 255, 255, 0.6)"
-                          },
-                          "& .MuiInputLabel-root.Mui-focused": {
-                            color: "#667eea"
-                          }
-                        }}
+                        required disabled={loading} sx={fieldSx}
                       />
 
-                      <TextField
-                        fullWidth
-                        label="Password"
+                      <TextField fullWidth label="Password"
                         type={showPassword ? "text" : "password"}
-                        value={password}
-                        autoComplete="new-password"
+                        value={password} autoComplete="new-password"
                         onChange={(e) => setPassword(e.target.value)}
-                        required
-                        disabled={loading}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            bgcolor: "rgba(255, 255, 255, 0.05)",
-                            backdropFilter: "blur(10px)",
-                            borderRadius: 2,
-                            transition: "all 0.3s ease",
-                            "& fieldset": {
-                              borderColor: "rgba(255, 255, 255, 0.2)",
-                              borderWidth: "1px"
-                            },
-                            "&:hover fieldset": {
-                              borderColor: "rgba(102, 126, 234, 0.5)"
-                            },
-                            "&.Mui-focused fieldset": {
-                              borderColor: "#667eea",
-                              borderWidth: "2px"
-                            },
-                            "& input": {
-                              color: "#fff"
-                            }
-                          },
-                          "& .MuiInputLabel-root": {
-                            color: "rgba(255, 255, 255, 0.6)"
-                          },
-                          "& .MuiInputLabel-root.Mui-focused": {
-                            color: "#667eea"
-                          }
-                        }}
+                        required disabled={loading} sx={fieldSx}
                         InputProps={{
                           endAdornment: (
                             <InputAdornment position="end">
-                              <IconButton
-                                onClick={() => setShowPassword(!showPassword)}
-                                edge="end"
-                                disabled={loading}
+                              <IconButton onClick={() => setShowPassword(!showPassword)}
+                                edge="end" disabled={loading}
                                 sx={{ color: "rgba(255, 255, 255, 0.6)" }}
                               >
                                 {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                               </IconButton>
                             </InputAdornment>
-                          )
+                          ),
                         }}
                       />
 
                       {error && (
                         <Fade in>
-                          <Typography
-                            color="error"
-                            variant="body2"
-                            sx={{
-                              bgcolor: "rgba(244, 67, 54, 0.15)",
-                              backdropFilter: "blur(10px)",
-                              p: 1.5,
-                              borderRadius: 2,
-                              border: "1px solid rgba(244, 67, 54, 0.3)",
-                              color: "#ff6b6b"
-                            }}
-                          >
+                          <Typography variant="body2" sx={{
+                            bgcolor: "rgba(244, 67, 54, 0.15)", backdropFilter: "blur(10px)",
+                            p: 1.5, borderRadius: 2, border: "1px solid rgba(244, 67, 54, 0.3)",
+                            color: "#ff6b6b", fontSize: { xs: "0.78rem", sm: "0.875rem" },
+                          }}>
                             {error}
                           </Typography>
                         </Fade>
                       )}
 
-                      <Button
-                        type="submit"
-                        fullWidth
-                        size="large"
-                        variant="contained"
-                        disabled={loading}
-                        sx={{
-                          py: 1.8,
-                          borderRadius: 2.5,
-                          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                          fontSize: "1rem",
-                          fontWeight: 600,
-                          textTransform: "none",
-                          boxShadow: "0 8px 24px rgba(102, 126, 234, 0.4)",
-                          border: "1px solid rgba(255, 255, 255, 0.1)",
-                          transition: "all 0.3s ease",
-                          position: "relative",
-                          overflow: "hidden",
-                          "&::before": {
-                            content: '""',
-                            position: "absolute",
-                            top: 0,
-                            left: "-100%",
-                            width: "100%",
-                            height: "100%",
-                            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
-                            transition: "left 0.5s ease"
-                          },
-                          "&:hover": {
-                            background: "linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)",
-                            boxShadow: "0 12px 32px rgba(102, 126, 234, 0.6)",
-                            transform: "translateY(-2px)",
-                            "&::before": {
-                              left: "100%"
-                            }
-                          },
-                          "&:active": {
-                            transform: "translateY(0px)"
-                          }
-                        }}
+                      <Button type="submit" fullWidth size="large" variant="contained"
+                        disabled={loading} sx={submitBtnSx}
                       >
                         {loading ? "Sending OTP..." : "Sign in"}
                       </Button>
 
-                      <Divider 
-                        sx={{ 
-                          my: 2,
-                          "&::before, &::after": {
-                            borderColor: "rgba(255, 255, 255, 0.2)"
-                          }
-                        }}
-                      >
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            color: "rgba(255, 255, 255, 0.5)",
-                            px: 2
-                          }}
-                        >
+                      <Divider sx={{
+                        my: { xs: 0.5, sm: 2 },
+                        "&::before, &::after": { borderColor: "rgba(255, 255, 255, 0.2)" },
+                      }}>
+                        <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.5)", px: 2, fontSize: "0.8rem" }}>
                           or
                         </Typography>
                       </Divider>
 
-                      <Button
-                        fullWidth
-                        size="large"
-                        variant="outlined"
-                        disabled={loading}
+                      <Button fullWidth size="large" variant="outlined" disabled={loading}
                         sx={{
-                          py: 1.8,
+                          py: { xs: 1.4, sm: 1.8 },
                           borderRadius: 2.5,
                           borderColor: "rgba(255, 255, 255, 0.2)",
                           color: "#fff",
                           textTransform: "none",
                           fontWeight: 600,
+                          fontSize: { xs: "0.85rem", sm: "0.95rem" },
                           bgcolor: "rgba(255, 255, 255, 0.05)",
                           backdropFilter: "blur(10px)",
                           transition: "all 0.3s ease",
@@ -591,8 +393,8 @@ console.log("Avatar in login:", res.data.avatar);  // ADD THIS
                             borderColor: "rgba(255, 255, 255, 0.4)",
                             bgcolor: "rgba(255, 255, 255, 0.1)",
                             transform: "translateY(-2px)",
-                            boxShadow: "0 8px 20px rgba(255, 255, 255, 0.1)"
-                          }
+                            boxShadow: "0 8px 20px rgba(255, 255, 255, 0.1)",
+                          },
                         }}
                         onClick={() => {
                           const backend = (window.__ENV && window.__ENV.BACKEND_URL) || "http://localhost:5000";
@@ -600,7 +402,7 @@ console.log("Avatar in login:", res.data.avatar);  // ADD THIS
                         }}
                       >
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                          <svg width="20" height="20" viewBox="0 0 24 24">
+                          <svg width="18" height="18" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -612,19 +414,15 @@ console.log("Avatar in login:", res.data.avatar);  // ADD THIS
                     </Stack>
                   </form>
 
-                  <Box sx={{ mt: 4, textAlign: "center" }}>
-                    <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.6)" }}>
+                  <Box sx={{ mt: { xs: 2.5, sm: 4 }, textAlign: "center" }}>
+                    <Typography variant="body2" sx={{
+                      color: "rgba(255, 255, 255, 0.6)",
+                      fontSize: { xs: "0.78rem", sm: "0.875rem" },
+                    }}>
                       Don't have an account?{" "}
-                      <Link
-                        to="/register"
-                        style={{
-                          color: "#667eea",
-                          fontWeight: 600,
-                          textDecoration: "none",
-                          transition: "all 0.3s ease"
-                        }}
-                        onMouseEnter={(e) => e.target.style.color = "#764ba2"}
-                        onMouseLeave={(e) => e.target.style.color = "#667eea"}
+                      <Link to="/register" style={{ color: "#667eea", fontWeight: 600, textDecoration: "none" }}
+                        onMouseEnter={(e) => (e.target.style.color = "#764ba2")}
+                        onMouseLeave={(e) => (e.target.style.color = "#667eea")}
                       >
                         Create account
                       </Link>
@@ -632,164 +430,69 @@ console.log("Avatar in login:", res.data.avatar);  // ADD THIS
                   </Box>
                 </>
               ) : (
-                // OTP VERIFICATION FORM
+                // OTP FORM
                 <form onSubmit={handleVerifyOtp}>
-                  <Stack spacing={3}>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: "rgba(255, 255, 255, 0.7)",
-                        mb: 1,
-                        textAlign: "center"
-                      }}
-                    >
-                      OTP has been sent to <strong style={{ color: "#667eea" }}>{email}</strong>
+                  <Stack spacing={{ xs: 2, sm: 3 }}>
+                    <Typography variant="body2" sx={{
+                      color: "rgba(255, 255, 255, 0.7)", textAlign: "center",
+                      fontSize: { xs: "0.78rem", sm: "0.875rem" },
+                    }}>
+                      OTP sent to <strong style={{ color: "#667eea" }}>{email}</strong>
                     </Typography>
 
-                    <TextField
-                      fullWidth
-                      label="Enter 6-digit OTP"
-                      type="text"
+                    <TextField fullWidth label="Enter 6-digit OTP" type="text"
                       value={otp}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 6);
+                        const value = e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6);
                         setOtp(value);
                       }}
-                      required
-                      disabled={loading}
-                      placeholder="AB1234"
+                      required disabled={loading} placeholder="AB1234"
                       inputProps={{ maxLength: 6, inputMode: "text" }}
                       sx={{
+                        ...fieldSx,
                         "& .MuiOutlinedInput-root": {
-                          bgcolor: "rgba(255, 255, 255, 0.05)",
-                          backdropFilter: "blur(10px)",
-                          borderRadius: 2,
-                          fontSize: "1.2rem",
+                          ...fieldSx["& .MuiOutlinedInput-root"],
+                          fontSize: { xs: "1rem", sm: "1.2rem" },
                           letterSpacing: "0.5em",
-                          textAlign: "center",
-                          transition: "all 0.3s ease",
-                          "& fieldset": {
-                            borderColor: "rgba(255, 255, 255, 0.2)",
-                            borderWidth: "1px"
-                          },
-                          "&:hover fieldset": {
-                            borderColor: "rgba(102, 126, 234, 0.5)"
-                          },
-                          "&.Mui-focused fieldset": {
-                            borderColor: "#667eea",
-                            borderWidth: "2px"
-                          },
-                          "& input": {
-                            color: "#fff",
-                            textAlign: "center"
-                          }
+                          "& input": { color: "#fff", textAlign: "center" },
                         },
-                        "& .MuiInputLabel-root": {
-                          color: "rgba(255, 255, 255, 0.6)"
-                        },
-                        "& .MuiInputLabel-root.Mui-focused": {
-                          color: "#667eea"
-                        }
                       }}
                     />
 
                     {error && (
                       <Fade in>
-                        <Typography
-                          color="error"
-                          variant="body2"
-                          sx={{
-                            bgcolor: "rgba(244, 67, 54, 0.15)",
-                            backdropFilter: "blur(10px)",
-                            p: 1.5,
-                            borderRadius: 2,
-                            border: "1px solid rgba(244, 67, 54, 0.3)",
-                            color: "#ff6b6b"
-                          }}
-                        >
+                        <Typography variant="body2" sx={{
+                          bgcolor: "rgba(244, 67, 54, 0.15)", backdropFilter: "blur(10px)",
+                          p: 1.5, borderRadius: 2, border: "1px solid rgba(244, 67, 54, 0.3)",
+                          color: "#ff6b6b", fontSize: { xs: "0.78rem", sm: "0.875rem" },
+                        }}>
                           {error}
                         </Typography>
                       </Fade>
                     )}
 
-                    <Button
-                      type="submit"
-                      fullWidth
-                      size="large"
-                      variant="contained"
-                      disabled={loading || otp.length !== 6}
-                      sx={{
-                        py: 1.8,
-                        borderRadius: 2.5,
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        fontSize: "1rem",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        boxShadow: "0 8px 24px rgba(102, 126, 234, 0.4)",
-                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                        transition: "all 0.3s ease",
-                        position: "relative",
-                        overflow: "hidden",
-                        "&::before": {
-                          content: '""',
-                          position: "absolute",
-                          top: 0,
-                          left: "-100%",
-                          width: "100%",
-                          height: "100%",
-                          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
-                          transition: "left 0.5s ease"
-                        },
-                        "&:hover": {
-                          background: "linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)",
-                          boxShadow: "0 12px 32px rgba(102, 126, 234, 0.6)",
-                          transform: "translateY(-2px)",
-                          "&::before": {
-                            left: "100%"
-                          }
-                        },
-                        "&:active": {
-                          transform: "translateY(0px)"
-                        },
-                        "&.Mui-disabled": {
-                          background: "rgba(255, 255, 255, 0.1)",
-                          color: "rgba(255, 255, 255, 0.3)"
-                        }
-                      }}
+                    <Button type="submit" fullWidth size="large" variant="contained"
+                      disabled={loading || otp.length !== 6} sx={submitBtnSx}
                     >
                       {loading ? "Verifying..." : "Verify OTP"}
                     </Button>
 
-                    <Button
-                      fullWidth
-                      variant="text"
-                      disabled={loading}
-                      onClick={handleBackToLogin}
+                    <Button fullWidth variant="text" disabled={loading} onClick={handleBackToLogin}
                       sx={{
-                        color: "rgba(255, 255, 255, 0.7)",
-                        textTransform: "none",
-                        "&:hover": {
-                          bgcolor: "rgba(255, 255, 255, 0.05)",
-                          color: "#fff"
-                        }
+                        color: "rgba(255, 255, 255, 0.7)", textTransform: "none",
+                        fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                        "&:hover": { bgcolor: "rgba(255, 255, 255, 0.05)", color: "#fff" },
                       }}
                     >
                       ← Back to Login
                     </Button>
 
-                    <Button
-                      fullWidth
-                      size="small"
-                      variant="text"
-                      disabled={loading || resendLoading}
-                      onClick={handleResendOTP}
-                      sx={{ 
-                        color: "#667eea",
-                        textTransform: "none",
-                        "&:hover": {
-                          bgcolor: "rgba(102, 126, 234, 0.1)",
-                          color: "#764ba2"
-                        }
+                    <Button fullWidth size="small" variant="text"
+                      disabled={loading || resendLoading} onClick={handleResendOTP}
+                      sx={{
+                        color: "#667eea", textTransform: "none",
+                        fontSize: { xs: "0.78rem", sm: "0.875rem" },
+                        "&:hover": { bgcolor: "rgba(102, 126, 234, 0.1)", color: "#764ba2" },
                       }}
                     >
                       {resendLoading ? "Resending..." : "Didn't receive code? Resend OTP"}
