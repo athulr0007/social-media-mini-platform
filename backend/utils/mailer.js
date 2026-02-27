@@ -1,17 +1,40 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let transporter;
+
+const createTransporter = () => {
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false, // TLS
+      auth: {
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS,
+      },
+    });
+  }
+  return transporter;
+};
 
 const sendOTP = async (email, otp) => {
-  const { data, error } = await resend.emails.send({
-    from: "Spark <onboarding@resend.dev>",
+  const transporter = createTransporter();
+
+  const info = await transporter.sendMail({
+    from: `"Spark" <${process.env.BREVO_USER}>`,
     to: email,
     subject: "Your Verification Code - Spark",
-    html: `<p>Your OTP is <strong>${otp}</strong>. Valid for 10 minutes.</p>`,
+    html: `
+      <div style="font-family:Arial,sans-serif">
+        <h2>Verification Code</h2>
+        <p>Your OTP is:</p>
+        <h1>${otp}</h1>
+        <p>This code is valid for 10 minutes.</p>
+      </div>
+    `,
   });
 
-  if (error) throw new Error(error.message);
-  return data;
+  return info;
 };
 
 export default sendOTP;
