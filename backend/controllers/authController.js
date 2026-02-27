@@ -91,7 +91,8 @@ export const loginUser = async (req, res) => {
     await sendOTP(email, otp);
 
     res.json({ message: "Login OTP sent" });
-  } catch {
+   } catch (err) {
+    console.error("LOGIN ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
