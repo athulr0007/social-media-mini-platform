@@ -43,15 +43,19 @@ export default function Inbox() {
     }
   };
 
-  const startBotChat = async () => {
-    try {
-      const bot = await API.get("/users/bot");
-      const res = await API.post(`/conversations/${bot.data._id}`);
-      navigate(`/messages/${res.data._id}`);
-    } catch (err) {
-      console.error("Failed to start bot chat:", err);
+const startBotChat = async () => {
+  try {
+    const botRes = await API.get("/users/bot");
+    if (!botRes.data?._id) {
+      console.error("Bot user not found");
+      return;
     }
-  };
+    const res = await API.post(`/conversations/${botRes.data._id}`);
+    navigate(`/messages/${res.data._id}`);
+  } catch (err) {
+    console.error("Failed to start bot chat:", err);
+  }
+};
 
   if (loading) {
     return (
