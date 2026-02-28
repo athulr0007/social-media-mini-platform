@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Avatar, Stack, Skeleton, Divider } from "@mui/material";
 import { useActivity } from "../context/ActivityContext";
+import { BACKEND_URL } from "../utils/config";
 
 export default function RightSidebar() {
   const navigate = useNavigate();
@@ -81,7 +82,7 @@ export default function RightSidebar() {
             >
               <Avatar
                 sx={{ width: 40, height: 40 }}
-                src={activity.actor?.avatar ? `http://localhost:5000${activity.actor.avatar}` : undefined}
+                src={activity.actor?.avatar ? `${BACKEND_URL}${activity.actor.avatar}` : undefined}
               >
                 {!activity.actor?.avatar && (activity.actor?.name?.[0])}
               </Avatar>

@@ -2,6 +2,7 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import { BACKEND_URL } from "../utils/config";
 import {
   Box,
   Card,
@@ -382,7 +383,7 @@ export default function Feed() {
         {story.media ? (
           <Box
             component="img"
-            src={`http://localhost:5000${story.media}`}
+            src={`${BACKEND_URL}${story.media}`}
             sx={{ 
               width: "100%", 
               height: "100%", 
@@ -409,7 +410,7 @@ export default function Feed() {
 
         {/* Glowing Avatar */}
         <Avatar
-          src={story.user?.avatar ? `http://localhost:5000${story.user.avatar}` : undefined}
+          src={story.user?.avatar ? `${BACKEND_URL}${story.user.avatar}` : undefined}
           sx={{
             position: "absolute",
             top: 8,
@@ -493,7 +494,7 @@ export default function Feed() {
             <CardHeader
               avatar={
                 <Avatar
-                  src={post.user?.avatar ? `http://localhost:5000${post.user.avatar}` : undefined}
+                  src={post.user?.avatar ? `${BACKEND_URL}${post.user.avatar}` : undefined}
                   sx={{ cursor: "pointer", width: 40, height: 40 }}
                   onClick={() => navigate(`/profile/${post.user?._id}`)}
                 >
@@ -630,7 +631,7 @@ export default function Feed() {
             <Box sx={{ p: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <Stack direction="row" spacing={1.5} alignItems="center">
                 <Avatar
-                  src={stories[activeStoryIndex].user?.avatar ? `http://localhost:5000${stories[activeStoryIndex].user.avatar}` : undefined}
+                  src={stories[activeStoryIndex].user?.avatar ? `${BACKEND_URL}${stories[activeStoryIndex].user.avatar}` : undefined}
                   sx={{ width: 36, height: 36 }}
                 >
                   {!stories[activeStoryIndex].user?.avatar && (stories[activeStoryIndex].user?.name?.[0] || "?")}
@@ -672,7 +673,7 @@ export default function Feed() {
             >
               {stories[activeStoryIndex].media ? (
                 <img
-                  src={`http://localhost:5000${stories[activeStoryIndex].media}`}
+                  src={`${BACKEND_URL}${stories[activeStoryIndex].media}`}
                   style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
                   alt="Story"
                 />

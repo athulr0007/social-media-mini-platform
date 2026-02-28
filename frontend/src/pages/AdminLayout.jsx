@@ -32,6 +32,7 @@ import AdminReports from "./AdminReports";
 import AdminUsers from "./AdminUsers";
 import AdminPosts from "./AdminPosts";
 import AdminLogs from "./AdminLogs";
+import { BACKEND_URL } from "../utils/config";
 
 const drawerWidth = 260;
 
@@ -182,7 +183,7 @@ export default function AdminLayout() {
                 </Typography>
               )}
               <Avatar 
-                src={user?.avatar ? `http://localhost:5000${user.avatar}` : undefined}
+                src={user?.avatar ? `${BACKEND_URL}${user.avatar}` : undefined}
                 sx={{
                   width: { xs: 32, md: 36 },
                   height: { xs: 32, md: 36 },

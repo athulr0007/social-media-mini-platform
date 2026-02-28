@@ -37,7 +37,7 @@ import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 import PersonRemoveRoundedIcon from "@mui/icons-material/PersonRemoveRounded";
 import ExploreRoundedIcon from "@mui/icons-material/ExploreRounded";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
-
+import { BACKEND_URL } from "../utils/config";
 const formatTimeAgo = (date) => {
   const s = Math.floor((Date.now() - new Date(date)) / 1000);
   if (s < 60) return "now";
@@ -351,7 +351,7 @@ bgcolor: "background.default",
                         >
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Avatar
-                              src={u.avatar ? `http://localhost:5000${u.avatar}` : undefined}
+                              src={u.avatar ? `${BACKEND_URL}${u.avatar}` : undefined}
                               sx={{ 
                                 width: 56, 
                                 height: 56, 
@@ -480,7 +480,7 @@ color: "text.secondary",
                       <CardHeader
                         avatar={
                           <Avatar
-                            src={post.user?.avatar ? `http://localhost:5000${post.user.avatar}` : undefined}
+                            src={post.user?.avatar ? `${BACKEND_URL}${post.user.avatar}` : undefined}
                             sx={{ 
                               cursor: "pointer", 
                               width: 44, 
@@ -662,7 +662,7 @@ color: "text.secondary",
                         }}
                       >
                         <Avatar
-                          src={u.avatar ? `http://localhost:5000${u.avatar}` : undefined}
+                          src={u.avatar ? `${BACKEND_URL}${u.avatar}` : undefined}
                           sx={{
                             width: 80,
                             height: 80,

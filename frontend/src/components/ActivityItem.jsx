@@ -1,5 +1,6 @@
 import { Box, Avatar, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../utils/config";
 
 const ActivityItem = ({ activity }) => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const ActivityItem = ({ activity }) => {
       }}
     >
       <Avatar 
-        src={activity.actor?.avatar ? `http://localhost:5000${activity.actor.avatar}` : undefined}
+        src={activity.actor?.avatar ? `${BACKEND_URL}${activity.actor.avatar}` : undefined}
       >
         {!activity.actor?.avatar && (activity.actor?.name?.[0] || "?")}
       </Avatar>

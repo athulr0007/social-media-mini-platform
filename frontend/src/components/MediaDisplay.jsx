@@ -5,6 +5,7 @@ import PauseRoundedIcon from "@mui/icons-material/PauseRounded";
 import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded";
 import VolumeOffRoundedIcon from "@mui/icons-material/VolumeOffRounded";
 import FullscreenRoundedIcon from "@mui/icons-material/FullscreenRounded";
+import { BACKEND_URL } from "../utils/config";
 
 export default function MediaDisplay({ post, maxHeight = 500 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -111,7 +112,7 @@ export default function MediaDisplay({ post, maxHeight = 500 }) {
       {/* MEDIA DISPLAY */}
       {currentMedia.type === "image" ? (
         <img
-          src={`http://localhost:5000${currentMedia.url}`}
+          src={`${BACKEND_URL}${currentMedia.url}`}
           alt="post"
           style={{
             width: "100%",
@@ -133,7 +134,7 @@ export default function MediaDisplay({ post, maxHeight = 500 }) {
         >
           <video
             ref={(el) => videoRefs.current[videoId] = el}
-            src={`http://localhost:5000${currentMedia.url}`}
+            src={`${BACKEND_URL}${currentMedia.url}`}
             style={{
               width: "100%",
               maxHeight: maxHeight,

@@ -12,7 +12,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useActivity } from "../context/ActivityContext";
-
+import { BACKEND_URL } from "../utils/config";
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -132,7 +132,7 @@ if (isMobile) {
               transform: "scale(1.05)"
             }
           }}
-          src={user?.avatar ? `http://localhost:5000${user.avatar}` : undefined}
+          src={user?.avatar ? `${BACKEND_URL}${user.avatar}` : undefined}
           onClick={() => navigate("/profile")}
         >
           {!user?.avatar && (user?.name?.[0] || "U")}
@@ -340,7 +340,7 @@ if (isMobile) {
               boxShadow: "0 4px 16px rgba(102, 126, 234, 0.4)"
             }
           }}
-          src={user?.avatar ? `http://localhost:5000${user.avatar}` : undefined}
+          src={user?.avatar ? `${BACKEND_URL}${user.avatar}` : undefined}
           onClick={() => navigate("/profile")}
         >
           {!user?.avatar && (user?.name?.[0] || "U")}

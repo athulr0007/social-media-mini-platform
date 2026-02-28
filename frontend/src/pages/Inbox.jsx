@@ -20,6 +20,7 @@ import {
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import ChatBubbleRoundedIcon from "@mui/icons-material/ChatBubbleRounded";
+import { BACKEND_URL } from "../utils/config";
 
 export default function Inbox() {
   const { user } = useContext(AuthContext);
@@ -294,7 +295,7 @@ export default function Inbox() {
                   >
                     <ListItemAvatar>
                       <Avatar
-                        src={other?.avatar ? `http://localhost:5000${other.avatar}` : undefined}
+                        src={other?.avatar ? `${BACKEND_URL}${other.avatar}` : undefined}
                         sx={{
                           width: 52,
                           height: 52,

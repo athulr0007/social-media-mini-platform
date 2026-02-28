@@ -38,6 +38,7 @@ import ViewDayRoundedIcon from "@mui/icons-material/ViewDayRounded";
 import ReportRoundedIcon from "@mui/icons-material/ReportRounded";
 import MessageRoundedIcon from "@mui/icons-material/MessageRounded";
 import MediaDisplay from "../components/MediaDisplay";
+import { BACKEND_URL } from "../utils/config";
 
 import { MetalButton } from "../components/ui/metal-button";
 
@@ -188,7 +189,7 @@ export default function UserProfile() {
               <Avatar
                 src={
                   profileUser.avatar
-                    ? `http://localhost:5000${profileUser.avatar}`
+                    ? `${BACKEND_URL}${profileUser.avatar}`
                     : undefined
                 }
                 sx={{
@@ -455,7 +456,7 @@ export default function UserProfile() {
                     {(post.images?.length || post.videos?.length) ? (
   <>
     <img
-      src={`http://localhost:5000${post.images?.[0] || post.videos?.[0]}`}
+      src={`${BACKEND_URL}${post.images?.[0] || post.videos?.[0]}`}
       alt="post"
       style={{
         width: "100%",
@@ -559,7 +560,7 @@ export default function UserProfile() {
                           <Avatar
                             src={
                               profileUser.avatar
-                                ? `http://localhost:5000${profileUser.avatar}`
+                                ? `${BACKEND_URL}${profileUser.avatar}`
                                 : undefined
                             }
                           >
@@ -622,7 +623,7 @@ export default function UserProfile() {
                   <Avatar
                     src={
                       profileUser.avatar
-                        ? `http://localhost:5000${profileUser.avatar}`
+                        ? `${BACKEND_URL}${profileUser.avatar}`
                         : undefined
                     }
                   >
@@ -724,7 +725,7 @@ export default function UserProfile() {
                     <Avatar
                       src={
                         follower.avatar
-                          ? `http://localhost:5000${follower.avatar}`
+                          ? `${BACKEND_URL}${follower.avatar}`
                           : undefined
                       }
                       sx={{ width: 48, height: 48 }}
@@ -800,7 +801,7 @@ export default function UserProfile() {
                 >
                   <Stack direction="row" spacing={2} alignItems="center" mb={1.5}>
                     <Avatar
-                      src={u.avatar ? `http://localhost:5000${u.avatar}` : undefined}
+                      src={u.avatar ? `${BACKEND_URL}${u.avatar}` : undefined}
                       sx={{ width: 48, height: 48 }}
                     >
                       {!u.avatar && u.name[0]}

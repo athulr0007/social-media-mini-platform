@@ -19,8 +19,8 @@ import SendIcon from "@mui/icons-material/Send";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-
-const socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000");
+import { BACKEND_URL } from "../utils/config";
+const socket = io(import.meta.env.VITE_SOCKET_URL || "${BACKEND_URL}");
 
 export default function Messages() {
   const { id } = useParams();
@@ -172,7 +172,7 @@ export default function Messages() {
           </Box>
         ) : (
           <Avatar
-            src={otherUser?.avatar ? `http://localhost:5000${otherUser.avatar}` : undefined}
+            src={otherUser?.avatar ? `${BACKEND_URL}${otherUser.avatar}` : undefined}
             sx={{ 
               width: 44, 
               height: 44,
@@ -275,7 +275,7 @@ export default function Messages() {
                 {!isMe && (
                   <Box sx={{ position: "relative" }}>
                     <Avatar
-                      src={!isAIChat && otherUser?.avatar ? `http://localhost:5000${otherUser.avatar}` : undefined}
+                      src={!isAIChat && otherUser?.avatar ? `${BACKEND_URL}${otherUser.avatar}` : undefined}
                       sx={{ 
                         width: 32, 
                         height: 32, 
@@ -354,7 +354,7 @@ export default function Messages() {
 
                 {isMe && (
                   <Avatar
-                    src={user?.avatar ? `http://localhost:5000${user.avatar}` : undefined}
+                    src={user?.avatar ? `${BACKEND_URL}${user.avatar}` : undefined}
                     sx={{ 
                       width: 32, 
                       height: 32, 

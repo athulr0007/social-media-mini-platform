@@ -396,10 +396,9 @@ export default function Login() {
                             boxShadow: "0 8px 20px rgba(255, 255, 255, 0.1)",
                           },
                         }}
-                        onClick={() => {
-                          const backend = (window.__ENV && window.__ENV.BACKEND_URL) || "http://localhost:5000";
-                          window.location.href = `${backend}/api/auth/google`;
-                        }}
+                       onClick={() => {
+  window.location.href = `${BACKEND_URL}/api/auth/google`;
+}}
                       >
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                           <svg width="18" height="18" viewBox="0 0 24 24">

@@ -21,6 +21,7 @@ import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 import MessageRoundedIcon from "@mui/icons-material/MessageRounded";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import DeleteSweepRoundedIcon from "@mui/icons-material/DeleteSweepRounded";
+import { BACKEND_URL } from "../utils/config";
 
 const labelMap = {
   like: "liked your post",
@@ -250,7 +251,7 @@ export default function Notifications() {
                             {/* Avatar with type badge */}
                             <Box sx={{ position: "relative", flexShrink: 0 }}>
                               <Avatar
-                                src={activity.actor?.avatar ? `http://localhost:5000${activity.actor.avatar}` : undefined}
+                                src={activity.actor?.avatar ? `${BACKEND_URL}${activity.actor.avatar}` : undefined}
                                 sx={{
                                   width: 48,
                                   height: 48,

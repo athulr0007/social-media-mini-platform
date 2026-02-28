@@ -43,6 +43,7 @@ import GridOnRoundedIcon from "@mui/icons-material/GridOnRounded";
 import ViewDayRoundedIcon from "@mui/icons-material/ViewDayRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import { BACKEND_URL } from "../utils/config";
 
 import ArchiveRoundedIcon from "@mui/icons-material/ArchiveRounded";
 import UnarchiveRoundedIcon from "@mui/icons-material/UnarchiveRounded";
@@ -311,7 +312,7 @@ const updateProfile = async () => {
           >
             <Box sx={{ position: "relative" }}>
               <Avatar
-                src={user.avatar ? `http://localhost:5000${user.avatar}` : undefined}
+                src={user.avatar ? `${BACKEND_URL}${user.avatar}` : undefined}
                 sx={{
                   width: isMobile ? 120 : 150,
                   height: isMobile ? 120 : 150,
@@ -572,7 +573,7 @@ const updateProfile = async () => {
       
       return isVideo ? (
         <video
-          src={`http://localhost:5000${mediaUrl}`}
+          src={`${BACKEND_URL}${mediaUrl}`}
           style={{
             width: "100%",
             height: "100%",
@@ -582,7 +583,7 @@ const updateProfile = async () => {
         />
       ) : (
         <img
-          src={`http://localhost:5000${mediaUrl}`}
+          src={`${BACKEND_URL}${mediaUrl}`}
           alt="post"
           style={{
             width: "100%",
@@ -688,7 +689,7 @@ const updateProfile = async () => {
                           <Avatar
                             src={
                               user.avatar
-                                ? `http://localhost:5000${user.avatar}`
+                                ? `${BACKEND_URL}${user.avatar}`
                                 : undefined
                             }
                           >
@@ -760,7 +761,7 @@ const updateProfile = async () => {
                 avatar={
                   <Avatar
                     src={
-                      user.avatar ? `http://localhost:5000${user.avatar}` : undefined
+                      user.avatar ? `${BACKEND_URL}${user.avatar}` : undefined
                     }
                   >
                     {!user.avatar && user.name[0]}
@@ -911,7 +912,7 @@ const updateProfile = async () => {
                 <Avatar
                   src={
                     avatarPreview ||
-                    (user.avatar ? `http://localhost:5000${user.avatar}` : undefined)
+                    (user.avatar ? `${BACKEND_URL}${user.avatar}` : undefined)
                   }
                   sx={{ width: 120, height: 120, mx: "auto" }}
                 >
@@ -1020,7 +1021,7 @@ const updateProfile = async () => {
                     <Avatar
                       src={
                         follower.avatar
-                          ? `http://localhost:5000${follower.avatar}`
+                          ? `${BACKEND_URL}${follower.avatar}`
                           : undefined
                       }
                       sx={{ width: 48, height: 48 }}
@@ -1097,7 +1098,7 @@ const updateProfile = async () => {
                   <Stack direction="row" spacing={2} alignItems="center" mb={1.5}>
                     <Avatar
                       src={
-                        u.avatar ? `http://localhost:5000${u.avatar}` : undefined
+                        u.avatar ? `${BACKEND_URL}${u.avatar}` : undefined
                       }
                       sx={{ width: 48, height: 48 }}
                     >
