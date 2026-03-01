@@ -477,127 +477,191 @@ export default function Feed() {
         })}
       </Box>
 
-      {/* POSTS SECTION */}
-      {posts.map((post) => {
-        const liked = post.likes.includes(user._id);
+{/* POSTS SECTION */}
+{posts.length === 0 ? (
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      py: 8,
+      px: 2,
+      textAlign: "center"
+    }}
+  >
+    <Box
+      sx={{
+        width: 80,
+        height: 80,
+        borderRadius: "50%",
+        background: "linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.15))",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        mb: 3,
+        animation: "pulse 2s ease-in-out infinite",
+        "@keyframes pulse": {
+          "0%, 100%": { transform: "scale(1)", opacity: 0.8 },
+          "50%": { transform: "scale(1.08)", opacity: 1 }
+        }
+      }}
+    >
+      <Typography sx={{ fontSize: "2.5rem" }}>✨</Typography>
+    </Box>
 
-        return (
-          <Card key={post._id} sx={{ mb: 3 }}>
-            <CardHeader
-              avatar={
-                <Avatar
-                  src={post.user?.avatar ? `${BACKEND_URL}${post.user.avatar}` : undefined}
-                  sx={{ cursor: "pointer", width: 40, height: 40 }}
-                  onClick={() => navigate(`/profile/${post.user?._id}`)}
-                >
-                  {!post.user?.avatar && (post.user?.name?.[0] || "?")}
-                </Avatar>
-              }
-              title={
-                <Typography
-                  variant="body1"
-                  fontWeight={600}
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/profile/${post.user?._id}`)}
-                >
-                  {post.user?.name || "Unknown"}
-                </Typography>
-              }
-              subheader={
-                <Typography variant="caption" color="text.secondary">
-                  {formatTimeAgo(post.createdAt)}
-                </Typography>
-              }
-              action={
-                <>
-                  <IconButton size="small" onClick={(e) => openPostMenu(e, post)}>
-                    <MoreHorizRoundedIcon />
-                  </IconButton>
-                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl) && menuPost?._id === post._id} onClose={closePostMenu}>
-                    {post.user?._id === user._id ? (
-                      <MenuItem onClick={async () => { await API.delete(`/posts/${post._id}`); setPosts((p)=>p.filter(x=>x._id!==post._id)); closePostMenu(); }}>Delete</MenuItem>
-                    ) : (
-                      <MenuItem onClick={() => startReportPost(post)}>
-                        <FlagRoundedIcon sx={{ mr: 1 }} /> Report
-                      </MenuItem>
-                    )}
-                  </Menu>
-                </>
-              }
-            />
+    <Typography variant="h6" fontWeight={700} mb={1}>
+      Your feed is empty
+    </Typography>
 
-            <MediaDisplay post={post} maxHeight={500} />
+    <Typography variant="body2" color="text.secondary" mb={3} maxWidth={300}>
+      Follow people to see their posts, stories and updates here.
+    </Typography>
 
-            {post.content && (
-              <CardContent>
-                <Typography variant="body1" color="text.primary">
-                  {post.content}
-                </Typography>
-              </CardContent>
-            )}
+    <Button
+      variant="contained"
+      onClick={() => navigate("/explore")}
+      sx={{
+        textTransform: "none",
+        borderRadius: 3,
+        px: 4,
+        py: 1.2,
+        fontWeight: 600,
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        boxShadow: "0 8px 24px rgba(102,126,234,0.4)",
+        "&:hover": {
+          background: "linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)",
+          transform: "translateY(-2px)",
+          boxShadow: "0 12px 28px rgba(102,126,234,0.5)"
+        },
+        transition: "all 0.3s ease"
+      }}
+    >
+      Explore People to Follow
+    </Button>
+  </Box>
+) : (
+  posts.map((post) => {
+    const liked = post.likes.includes(user._id);
 
-            <CardActions sx={{ px: 2, pb: 2 }}>
-              <IconButton onClick={() => toggleLike(post._id)} size="small">
-                {liked ? (
-                  <FavoriteRoundedIcon sx={{ color: "#dc2626" }} fontSize="small" />
+    return (
+      <Card key={post._id} sx={{ mb: 3 }}>
+        <CardHeader
+          avatar={
+            <Avatar
+              src={post.user?.avatar ? `${BACKEND_URL}${post.user.avatar}` : undefined}
+              sx={{ cursor: "pointer", width: 40, height: 40 }}
+              onClick={() => navigate(`/profile/${post.user?._id}`)}
+            >
+              {!post.user?.avatar && (post.user?.name?.[0] || "?")}
+            </Avatar>
+          }
+          title={
+            <Typography
+              variant="body1"
+              fontWeight={600}
+              sx={{ cursor: "pointer" }}
+              onClick={() => navigate(`/profile/${post.user?._id}`)}
+            >
+              {post.user?.name || "Unknown"}
+            </Typography>
+          }
+          subheader={
+            <Typography variant="caption" color="text.secondary">
+              {formatTimeAgo(post.createdAt)}
+            </Typography>
+          }
+          action={
+            <>
+              <IconButton size="small" onClick={(e) => openPostMenu(e, post)}>
+                <MoreHorizRoundedIcon />
+              </IconButton>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl) && menuPost?._id === post._id} onClose={closePostMenu}>
+                {post.user?._id === user._id ? (
+                  <MenuItem onClick={async () => { await API.delete(`/posts/${post._id}`); setPosts((p)=>p.filter(x=>x._id!==post._id)); closePostMenu(); }}>Delete</MenuItem>
                 ) : (
-                  <FavoriteBorderRoundedIcon fontSize="small" />
+                  <MenuItem onClick={() => startReportPost(post)}>
+                    <FlagRoundedIcon sx={{ mr: 1 }} /> Report
+                  </MenuItem>
                 )}
+              </Menu>
+            </>
+          }
+        />
+
+        <MediaDisplay post={post} maxHeight={500} />
+
+        {post.content && (
+          <CardContent>
+            <Typography variant="body1" color="text.primary">
+              {post.content}
+            </Typography>
+          </CardContent>
+        )}
+
+        <CardActions sx={{ px: 2, pb: 2 }}>
+          <IconButton onClick={() => toggleLike(post._id)} size="small">
+            {liked ? (
+              <FavoriteRoundedIcon sx={{ color: "#dc2626" }} fontSize="small" />
+            ) : (
+              <FavoriteBorderRoundedIcon fontSize="small" />
+            )}
+          </IconButton>
+          <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
+            {post.likes.length}
+          </Typography>
+
+          <IconButton onClick={() => loadComments(post._id)} size="small">
+            <ChatBubbleOutlineRoundedIcon fontSize="small" />
+          </IconButton>
+          <Typography variant="body2" color="text.secondary">
+            {comments[post._id]?.length ?? post.comments?.length ?? 0}
+          </Typography>
+        </CardActions>
+
+        <Collapse in={activeComment === post._id}>
+          <Divider />
+          <Box sx={{ p: 2 }}>
+            <Stack spacing={2} sx={{ mb: 2, maxHeight: 200, overflow: "auto" }}>
+              {comments[post._id]?.map((c, i) => (
+                <Box key={i}>
+                  <Typography variant="body2" fontWeight={600}>
+                    {c.user?.name || "Unknown"}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {c.text}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+
+            <Stack direction="row" spacing={1}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Add a comment..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    submitComment(post._id);
+                  }
+                }}
+              />
+              <IconButton
+                onClick={() => submitComment(post._id)}
+                disabled={!commentText.trim()}
+                size="small"
+              >
+                <SendRoundedIcon fontSize="small" />
               </IconButton>
-              <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
-                {post.likes.length}
-              </Typography>
-
-              <IconButton onClick={() => loadComments(post._id)} size="small">
-                <ChatBubbleOutlineRoundedIcon fontSize="small" />
-              </IconButton>
-              <Typography variant="body2" color="text.secondary">
-                {comments[post._id]?.length ?? post.comments?.length ?? 0}
-              </Typography>
-            </CardActions>
-
-            <Collapse in={activeComment === post._id}>
-              <Divider />
-              <Box sx={{ p: 2 }}>
-                <Stack spacing={2} sx={{ mb: 2, maxHeight: 200, overflow: "auto" }}>
-                  {comments[post._id]?.map((c, i) => (
-                    <Box key={i}>
-                      <Typography variant="body2" fontWeight={600}>
-                        {c.user?.name || "Unknown"}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {c.text}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Stack>
-
-                <Stack direction="row" spacing={1}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    placeholder="Add a comment..."
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        submitComment(post._id);
-                      }
-                    }}
-                  />
-                  <IconButton
-                    onClick={() => submitComment(post._id)}
-                    disabled={!commentText.trim()}
-                    size="small"
-                  >
-                    <SendRoundedIcon fontSize="small" />
-                  </IconButton>
-                </Stack>
-              </Box>
-            </Collapse>
-          </Card>
-        );
-      })}
+            </Stack>
+          </Box>
+        </Collapse>
+      </Card>
+    );
+  })
+)}
 
       {/* STORY VIEWER DIALOG */}
       <Dialog open={activeStoryIndex !== null} fullScreen>
